@@ -68,9 +68,19 @@ func main() {
 }
 
 func makeExecResultMessage(responseData responseData) string {
-	return "# stdout: \n" + responseData.Stdout + "\n" +
-		"# stderr: \n" + responseData.Stderr + "\n" +
-		"# return: \n" + strconv.Itoa(responseData.Rc)
+	var stdout = ""
+	if len(responseData.Stdout) != 0 {
+		stdout = "```" + responseData.Stdout + "\n```"
+	}
+
+	var stderr = ""
+	if len(responseData.Stderr) != 0 {
+		stderr = "```" + responseData.Stderr + "\n```"
+	}
+
+	return "# *stdout*: \n" + stdout + "\n" +
+		"# *stderr*: \n" + stderr + "\n" +
+		"# *return*: \n" + strconv.Itoa(responseData.Rc)
 }
 
 func sendMessage(message string, channelID string, rtm *slack.RTM) {
@@ -81,7 +91,8 @@ func sendRuttyRequest(command command.Command) (responseData, error) {
 	requestJSON := makeRequestJSON(command.Code())
 
 	// Todo: 環境変数に変える
-	resp, err := http.Post("http://localhost:3000/executors/"+command.Language(), "application/json", bytes.NewBuffer(requestJSON))
+	apiURL := os.Getenv("RUTTY_API_URL")
+	resp, err := http.Post(apiURL+command.Language(), "application/json", bytes.NewBuffer(requestJSON))
 	if err != nil {
 		return responseData{}, err
 	}
