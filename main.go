@@ -26,6 +26,7 @@ type responseData struct {
 }
 
 func main() {
+	// この辺の処理Serviceとかに切り出して良さそう
 	api := slack.New(os.Getenv("SLACK_TOKEN"))
 	rtm := api.NewRTM()
 	var botID, channelID string
@@ -47,26 +48,33 @@ func main() {
 			// 送信用コマンドをParse
 			command, err := command.CreateCommand(ev.Text)
 			if err != nil {
+				message := "入力をParseできませんでした！ごめんね！"
+				sendMessage(message, channelID, rtm)
 				continue
 			}
 
 			// RuttyへRequest送信
 			responseData, requestErr := sendRuttyRequest(command)
 			if requestErr != nil {
+				message := "Ruttyへのリクエストに失敗しました…"
+				sendMessage(message, channelID, rtm)
 				continue
 			}
 
 			// 結果送信
-			sendMessage(responseData, channelID, rtm)
+			message := makeExecResultMessage(responseData)
+			sendMessage(message, channelID, rtm)
 		}
 	}
 }
 
-func sendMessage(responseData responseData, channelID string, rtm *slack.RTM) {
-	message :=
-		"# stdout: \n" + responseData.Stdout + "\n" +
-			"# stderr: \n" + responseData.Stderr + "\n" +
-			"# return: \n" + strconv.Itoa(responseData.Rc)
+func makeExecResultMessage(responseData responseData) string {
+	return "# stdout: \n" + responseData.Stdout + "\n" +
+		"# stderr: \n" + responseData.Stderr + "\n" +
+		"# return: \n" + strconv.Itoa(responseData.Rc)
+}
+
+func sendMessage(message string, channelID string, rtm *slack.RTM) {
 	rtm.SendMessage(rtm.NewOutgoingMessage(message, channelID))
 }
 
