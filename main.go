@@ -25,6 +25,7 @@ type responseData struct {
 }
 
 func main() {
+	// TODO: ログ出力
 	// この辺の処理Serviceとかに切り出して良さそう
 	api := slack.New(os.Getenv("SLACK_TOKEN"))
 	rtm := api.NewRTM()
