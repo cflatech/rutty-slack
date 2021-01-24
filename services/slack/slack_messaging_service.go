@@ -5,8 +5,10 @@ import (
 	"strconv"
 	"strings"
 
+	// clientって外部との通信部だからビジネスロジックから依存するのは微妙な気がする
 	"github.com/k1hiiragi/rutty-slack/client"
 	"github.com/k1hiiragi/rutty-slack/domain/command"
+	"github.com/k1hiiragi/rutty-slack/domain/rutty"
 	"github.com/slack-go/slack"
 )
 
@@ -53,7 +55,7 @@ func Run() {
 	}
 }
 
-func makeExecResultMessage(responseData client.ResponseData) string {
+func makeExecResultMessage(responseData rutty.ResponseData) string {
 	var stdout = ""
 	if len(responseData.Stdout) != 0 {
 		stdout = "```" + responseData.Stdout + "\n```"

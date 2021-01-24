@@ -8,36 +8,25 @@ import (
 	"os"
 
 	"github.com/k1hiiragi/rutty-slack/domain/command"
+	"github.com/k1hiiragi/rutty-slack/domain/rutty"
 )
 
-// requestData Ruttyに投げるRequestData
-type requestData struct {
-	Code string `json:"code"`
-}
-
-// ResponseData Ruttyから返ってきたレスポンス
-type ResponseData struct {
-	Stdout string `json:"stdout"`
-	Stderr string `json:"stderr"`
-	Rc     int    `json:"rc"`
-}
-
 // SendRuttyRequest return (responseData, error)
-func SendRuttyRequest(command command.Command) (ResponseData, error) {
+func SendRuttyRequest(command command.Command) (rutty.ResponseData, error) {
 	requestJSON := makeRequestJSON(command.Code())
 
 	// Todo: 環境変数に変える
 	apiURL := os.Getenv("RUTTY_API_URL")
 	resp, err := http.Post(apiURL+command.Language(), "application/json", bytes.NewBuffer(requestJSON))
 	if err != nil {
-		return ResponseData{}, err
+		return rutty.ResponseData{}, err
 	}
 
 	body, _ := ioutil.ReadAll(resp.Body)
-	var execResult ResponseData
+	var execResult rutty.ResponseData
 	marshalErr := json.Unmarshal(body, &execResult)
 	if marshalErr != nil {
-		return ResponseData{}, marshalErr
+		return rutty.ResponseData{}, marshalErr
 	}
 
 	return execResult, nil
@@ -45,7 +34,7 @@ func SendRuttyRequest(command command.Command) (ResponseData, error) {
 }
 
 func makeRequestJSON(code string) []byte {
-	requestData := requestData{
+	requestData := rutty.RequestData{
 		Code: code,
 	}
 
