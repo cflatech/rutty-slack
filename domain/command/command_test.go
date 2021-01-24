@@ -58,6 +58,11 @@ func TestParseError(t *testing.T) {
 			arg:  "<@U01L10XDBQR>",
 			want: "Language not found",
 		},
+		{
+			name: "```が存在しない場合",
+			arg:  "<@U01L10XDBQR>\u00a0   ruby\nputs \"ruby\"",
+			want: "Code not found",
+		},
 	}
 
 	for _, tt := range tests {

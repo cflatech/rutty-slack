@@ -17,12 +17,15 @@ func CreateCommand(message string) (Command, error) {
 }
 
 func parse(message string) (Command, error) {
-	lang, err := parseLanguage(message)
-	if err != nil {
-		return Command{"", ""}, err
+	lang, langErr := parseLanguage(message)
+	if langErr != nil {
+		return Command{"", ""}, langErr
 	}
 
-	code := parseCode(message)
+	code, codeErr := parseCode(message)
+	if codeErr != nil {
+		return Command{"", ""}, codeErr
+	}
 	return Command{lang, code}, nil
 }
 
@@ -39,10 +42,13 @@ func parseLanguage(message string) (string, error) {
 	return splited[1], nil
 }
 
-func parseCode(message string) string {
+func parseCode(message string) (string, error) {
 	blockStart := strings.Index(message, "```") + 3
 	blockEnd := strings.LastIndex(message, "```")
-	return message[blockStart:blockEnd]
+	if blockStart < 0 || blockEnd < 0 {
+		return "", errors.New("Code not found")
+	}
+	return message[blockStart:blockEnd], nil
 }
 
 // Language return string
