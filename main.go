@@ -3,7 +3,6 @@ package main
 import (
 	"bytes"
 	"encoding/json"
-	"fmt"
 	"io/ioutil"
 	"net/http"
 	"os"
@@ -38,7 +37,6 @@ func main() {
 			botID = rtm.GetInfo().User.ID
 		case *slack.MessageEvent:
 			channelID = ev.Channel
-			fmt.Println(channelID)
 
 			// 自分へのメンションか確認
 			if !isMentionToBot(ev.Text, botID) {
