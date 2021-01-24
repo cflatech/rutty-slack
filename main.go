@@ -29,7 +29,7 @@ func main() {
 	// この辺の処理Serviceとかに切り出して良さそう
 	api := slack.New(os.Getenv("SLACK_TOKEN"))
 	rtm := api.NewRTM()
-	var botID, channelID string
+	var botID string
 	go rtm.ManageConnection()
 
 	for msg := range rtm.IncomingEvents {
@@ -37,7 +37,7 @@ func main() {
 		case *slack.ConnectedEvent:
 			botID = rtm.GetInfo().User.ID
 		case *slack.MessageEvent:
-			channelID = ev.Channel
+			channelID := ev.Channel
 
 			// 自分へのメンションか確認
 			if !isMentionToBot(ev.Text, botID) {
