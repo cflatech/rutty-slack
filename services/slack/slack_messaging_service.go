@@ -41,7 +41,7 @@ func Run() {
 			}
 
 			// RuttyへRequest送信
-			responseData, requestErr := client.SendRuttyRequest(command)
+			responseData, requestErr := client.SendRuttyExecuteRequest(command)
 			if requestErr != nil {
 				message := "Ruttyへのリクエストに失敗しました…"
 				sendMessage(message, channelID, rtm)
