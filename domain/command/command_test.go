@@ -35,6 +35,11 @@ func TestParse(t *testing.T) {
 			arg:  "<@U01L10XDBQR>\u00a0   ruby\n```puts \"ruby\"```",
 			want: Command{"ruby", "puts \"ruby\""},
 		},
+		{
+			name: "言語がPHPの場合",
+			arg:  "<@U01L10XDBQR>\u00a0   php\n```puts \"ruby\"```",
+			want: Command{"php", "puts \"ruby\""},
+		},
 	}
 
 	for _, tt := range tests {

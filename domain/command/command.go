@@ -31,7 +31,7 @@ func parse(message string) (Command, error) {
 
 func parseLanguage(message string) (string, error) {
 	trimed := strings.TrimSpace(message)
-	rep := regexp.MustCompile(`[:space:]+`)
+	rep := regexp.MustCompile(`[[:space:]]+`)
 	replaced := rep.ReplaceAllString(trimed, " ")
 	splited := strings.Fields(replaced)
 	if len(splited) < 2 {
