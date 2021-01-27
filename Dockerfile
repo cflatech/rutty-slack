@@ -15,7 +15,7 @@ RUN go build -o /go/bin/main -ldflags '-s -w'
 FROM alpine as runner
 
 ENV SLACK_TOKEN="" \
-    RUTTY_API_URL="localhost:3000/"
+    RUTTY_API_URL=""
 
 COPY --from=builder /go/bin/main /app/main
 
