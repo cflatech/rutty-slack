@@ -56,7 +56,7 @@ func TestParseError(t *testing.T) {
 		{
 			name: "言語が指定されていない場合エラーとなる",
 			arg:  "<@U01L10XDBQR>",
-			want: "Language not found",
+			want: "Parse Error",
 		},
 		{
 			name: "```が存在しない場合",
