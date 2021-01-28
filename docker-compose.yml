@@ -1,0 +1,20 @@
+version: '3'
+services:
+  app:
+    build: .
+    env_file: .env
+
+  rutty:
+    image: yantene/rutty
+    depends_on:
+      - dind
+    environment:
+      RAILS_ENV: "production"
+      SECRET_KEY_BASE: "28495e9d5b413be7eba10b624c30e8df258632abe807fec07ffa3d3de740da245ab2f1623223de44e15bdb5d685e3a10c35dfb99a8f51aacf2372a4cead03224"
+      AUTHORIZED_HOSTNAME: "rutty"
+      DOCKER_HOST: "tcp://dind:2375"
+  dind:
+    image: docker:20.10.2-dind
+    environment:
+      DOCKER_TLS_CERTDIR: ""
+    privileged: true
