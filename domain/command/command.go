@@ -17,38 +17,18 @@ func CreateCommand(message string) (Command, error) {
 }
 
 func parse(message string) (Command, error) {
-	lang, langErr := parseLanguage(message)
-	if langErr != nil {
-		return Command{"", ""}, langErr
-	}
-
-	code, codeErr := parseCode(message)
-	if codeErr != nil {
-		return Command{"", ""}, codeErr
-	}
-	return Command{lang, code}, nil
-}
-
-func parseLanguage(message string) (string, error) {
+	// slackの仕様, PHPの実行時などに問題が発生する
+	// https://api.slack.com/reference/surfaces/formatting
+	message = strings.ReplaceAll(strings.ReplaceAll(strings.ReplaceAll(message, "&amp;", "&"), "&lt;", "<"), "&gt;", ">")
 	trimed := strings.TrimSpace(message)
-	rep := regexp.MustCompile(`[:space:]+`)
-	replaced := rep.ReplaceAllString(trimed, " ")
-	splited := strings.Fields(replaced)
-	if len(splited) < 2 {
-		// 言語指定がない場合、空白を返す
-		return "", errors.New("Language not found")
+	rep, _ := regexp.Compile("([[:space:]]|\u00a0)+")
+	splited := rep.Split(trimed, 3)
+
+	if len(splited) < 3 {
+		return Command{"", ""}, errors.New("Parse Error")
 	}
 
-	return splited[1], nil
-}
-
-func parseCode(message string) (string, error) {
-	blockStart := strings.Index(message, "```") + 3
-	blockEnd := strings.LastIndex(message, "```")
-	if blockStart < 0 || blockEnd < 0 {
-		return "", errors.New("Code not found")
-	}
-	return message[blockStart:blockEnd], nil
+	return Command{splited[1], splited[2]}, nil
 }
 
 // Language return string

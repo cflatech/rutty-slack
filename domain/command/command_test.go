@@ -12,28 +12,33 @@ func TestParse(t *testing.T) {
 	}{
 		{
 			name: "正常系",
-			arg:  "<@U01L10XDBQR>\u00a0ruby\n```puts \"hello\"```",
+			arg:  "<@U01L10XDBQR>\u00a0ruby\nputs \"hello\"",
 			want: Command{"ruby", "puts \"hello\""},
 		},
 		{
 			name: "先頭に空白が入っている場合",
-			arg:  " <@U01L10XDBQR>\u00a0ruby\n```puts \"hello\"```",
+			arg:  " <@U01L10XDBQR>\u00a0ruby\nputs \"hello\"",
 			want: Command{"ruby", "puts \"hello\""},
 		},
 		{
 			name: "コード内に```がある場合",
-			arg:  "<@U01L10XDBQR>\u00a0ruby\n```puts 1 #```\nputs 2```",
+			arg:  "<@U01L10XDBQR>\u00a0ruby\nputs 1 #```\nputs 2",
 			want: Command{"ruby", "puts 1 #```\nputs 2"},
 		},
 		{
 			name: "ブロックまでに改行が入る場合",
-			arg:  "<@U01L10XDBQR> ruby\n\n\n\n```puts \"ruby\"```",
+			arg:  "<@U01L10XDBQR> ruby\n\n\n\nputs \"ruby\"",
 			want: Command{"ruby", "puts \"ruby\""},
 		},
 		{
 			name: "言語指定までに複数の空白がある場合",
-			arg:  "<@U01L10XDBQR>\u00a0   ruby\n```puts \"ruby\"```",
+			arg:  "<@U01L10XDBQR>\u00a0   ruby\nputs \"ruby\"",
 			want: Command{"ruby", "puts \"ruby\""},
+		},
+		{
+			name: "言語がPHPの場合",
+			arg:  "<@U01L10XDBQR>\u00a0php\n&lt;?php\necho 'hoge';",
+			want: Command{"php", "<?php\necho 'hoge';"},
 		},
 	}
 
@@ -56,12 +61,7 @@ func TestParseError(t *testing.T) {
 		{
 			name: "言語が指定されていない場合エラーとなる",
 			arg:  "<@U01L10XDBQR>",
-			want: "Language not found",
-		},
-		{
-			name: "```が存在しない場合",
-			arg:  "<@U01L10XDBQR>\u00a0   ruby\nputs \"ruby\"",
-			want: "Code not found",
+			want: "Parse Error",
 		},
 	}
 

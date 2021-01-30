@@ -1,11 +1,13 @@
 package slack
 
 import (
+	"log"
 	"os"
 	"strconv"
 	"strings"
 
 	// clientって外部との通信部だからビジネスロジックから依存するのは微妙な気がする
+
 	"github.com/k1hiiragi/rutty-slack/client"
 	"github.com/k1hiiragi/rutty-slack/domain/command"
 	"github.com/k1hiiragi/rutty-slack/domain/rutty"
@@ -24,6 +26,7 @@ func Run() {
 		switch ev := msg.Data.(type) {
 		case *slack.ConnectedEvent:
 			botID = rtm.GetInfo().User.ID
+			log.Println(botID)
 		case *slack.MessageEvent:
 			channelID := ev.Channel
 
@@ -33,15 +36,17 @@ func Run() {
 			}
 
 			// 送信用コマンドをParse
-			command, err := command.CreateCommand(ev.Text)
-			if err != nil {
+			command, parseErr := command.CreateCommand(ev.Text)
+			log.Printf("respose = %v, error = %v", command, parseErr)
+			if parseErr != nil {
 				message := "入力をParseできませんでした！ごめんね！"
 				sendMessage(message, channelID, rtm)
 				continue
 			}
 
 			// RuttyへRequest送信
-			responseData, requestErr := client.SendRuttyRequest(command)
+			responseData, requestErr := client.SendRuttyExecuteRequest(command)
+			log.Printf("response = %v, error = %v", responseData, requestErr)
 			if requestErr != nil {
 				message := "Ruttyへのリクエストに失敗しました…"
 				sendMessage(message, channelID, rtm)
@@ -50,6 +55,7 @@ func Run() {
 
 			// 結果送信
 			message := makeExecResultMessage(responseData)
+			log.Printf("sendMessage = \n%v", message)
 			sendMessage(message, channelID, rtm)
 		}
 	}
