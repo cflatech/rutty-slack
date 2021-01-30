@@ -25,13 +25,7 @@ func parse(message string) (Command, error) {
 		return Command{"", ""}, errors.New("Parse Error")
 	}
 
-	blockStart := strings.Index(splited[2], "```") + 3
-	blockEnd := strings.LastIndex(splited[2], "```")
-	if blockStart < 0 || blockEnd < 0 {
-		return Command{"", ""}, errors.New("Code not found")
-	}
-
-	return Command{splited[1], splited[2][blockStart:blockEnd]}, nil
+	return Command{splited[1], splited[2]}, nil
 }
 
 // Language return string
