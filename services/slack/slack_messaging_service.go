@@ -64,17 +64,20 @@ func Run() {
 func makeExecResultMessage(responseData rutty.ResponseData) string {
 	var stdout = ""
 	if len(responseData.Stdout) != 0 {
-		stdout = "```" + responseData.Stdout + "\n```"
+		stdout = "*stdout*\n```" + responseData.Stdout + "\n```\n"
 	}
 
 	var stderr = ""
 	if len(responseData.Stderr) != 0 {
-		stderr = "```" + responseData.Stderr + "\n```"
+		stderr = "*stderr*\n```" + responseData.Stderr + "\n```\n"
 	}
 
-	return "# *stdout*: \n" + stdout + "\n" +
-		"# *stderr*: \n" + stderr + "\n" +
-		"# *return*: \n" + strconv.Itoa(responseData.Rc)
+	var strReturn = ""
+	if responseData.Rc != 0 {
+		strReturn = "*return code*\n" + strconv.Itoa(responseData.Rc) + "\n"
+	}
+
+	return stdout + stderr + strReturn
 }
 
 func sendMessage(message string, channelID string, rtm *slack.RTM) {
