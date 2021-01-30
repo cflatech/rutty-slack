@@ -29,6 +29,7 @@ func Run() {
 			log.Println(botID)
 		case *slack.MessageEvent:
 			channelID := ev.Channel
+			log.Println(channelID)
 
 			// 自分へのメンションか確認
 			if !isMentionToBot(ev.Text, botID) {
