@@ -3,18 +3,28 @@ services:
   app:
     build: .
     env_file: .env
-
+    depends_on:
+      - rutty
   rutty:
     image: yantene/rutty
     depends_on:
-      - dind
+      redis:
+        condition: service_healthy
+      dind:
+        condition: service_healthy
     ports:
       - 3000:3000
     environment:
+      AUTHORIZED_HOSTNAME: "rutty"
       REDIS_URL: "redis://redis:6379"
       DOCKER_HOST: "tcp://dind:2375"
   dind:
     image: docker:20.10.2-dind
+    healthcheck:
+      test: ["CMD-SHELL", "docker run --rm hello-world || exit 1"]
+      interval: 30s
+      timeout: 5s
+      retries: 2
     environment:
       DOCKER_TLS_CERTDIR: ""
     privileged: true
