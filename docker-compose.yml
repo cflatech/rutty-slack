@@ -8,13 +8,20 @@ services:
     image: yantene/rutty
     depends_on:
       - dind
+    ports:
+      - 3000:3000
     environment:
-      RAILS_ENV: "production"
-      SECRET_KEY_BASE: "28495e9d5b413be7eba10b624c30e8df258632abe807fec07ffa3d3de740da245ab2f1623223de44e15bdb5d685e3a10c35dfb99a8f51aacf2372a4cead03224"
-      AUTHORIZED_HOSTNAME: "rutty"
+      REDIS_URL: "redis://redis:6379"
       DOCKER_HOST: "tcp://dind:2375"
   dind:
     image: docker:20.10.2-dind
     environment:
       DOCKER_TLS_CERTDIR: ""
     privileged: true
+  redis:
+    image: redis:6.0.10-alpine
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 1s
+      timeout: 3s
+      retries: 30
