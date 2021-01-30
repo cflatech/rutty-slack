@@ -37,8 +37,8 @@ func TestParse(t *testing.T) {
 		},
 		{
 			name: "言語がPHPの場合",
-			arg:  "<@U01L10XDBQR>\u00a0   php\nputs \"ruby\"",
-			want: Command{"php", "puts \"ruby\""},
+			arg:  "<@U01L10XDBQR>\u00a0php\n&lt;?php\necho 'hoge';",
+			want: Command{"php", "<?php\necho 'hoge';"},
 		},
 	}
 
