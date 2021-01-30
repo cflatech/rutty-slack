@@ -17,6 +17,9 @@ func CreateCommand(message string) (Command, error) {
 }
 
 func parse(message string) (Command, error) {
+	// slackの仕様, PHPの実行時などに問題が発生する
+	// https://api.slack.com/reference/surfaces/formatting
+	message = strings.ReplaceAll(strings.ReplaceAll(strings.ReplaceAll(message, "&amp;", "&"), "&lt;", "<"), "&gt;", ">")
 	trimed := strings.TrimSpace(message)
 	rep, _ := regexp.Compile("([[:space:]]|\u00a0)+")
 	splited := rep.Split(trimed, 3)
