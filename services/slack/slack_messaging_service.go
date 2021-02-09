@@ -38,7 +38,7 @@ func Run() {
 
 			// 送信用コマンドをParse
 			command, parseErr := command.CreateCommand(ev.Text)
-			log.Printf("respose = %v, error = %v", command, parseErr)
+			log.Printf("command = %v, error = %v", command, parseErr)
 			if parseErr != nil {
 				message := "入力をParseできませんでした！ごめんね！"
 				sendMessage(message, channelID, rtm)
@@ -47,7 +47,9 @@ func Run() {
 
 			// RuttyへRequest送信
 			responseData, requestErr := client.SendRuttyExecuteRequest(command)
-			log.Printf("response = %v, error = %v", responseData, requestErr)
+			formattedResponse := formatResponse(responseData)
+
+			log.Printf("response = %v, error = %v", formattedResponse, requestErr)
 			if requestErr != nil {
 				message := "Ruttyへのリクエストに失敗しました…"
 				sendMessage(message, channelID, rtm)
@@ -55,7 +57,7 @@ func Run() {
 			}
 
 			// 結果送信
-			message := makeExecResultMessage(responseData)
+			message := makeExecResultMessage(formattedResponse)
 			log.Printf("sendMessage = \n%v", message)
 			sendMessage(message, channelID, rtm)
 		}
@@ -87,4 +89,20 @@ func sendMessage(message string, channelID string, rtm *slack.RTM) {
 
 func isMentionToBot(message, botID string) bool {
 	return strings.HasPrefix(message, "<@"+botID+">")
+}
+
+func formatResponse(response rutty.ResponseData) rutty.ResponseData {
+	const responseLimit = 2000
+
+	stdout := response.Stdout
+	if len(stdout) > responseLimit {
+		stdout = response.Stdout[0:responseLimit]
+	}
+
+	stderr := response.Stderr
+	if len(stderr) > responseLimit {
+		stderr = response.Stdout[0:responseLimit]
+	}
+
+	return rutty.ResponseData{Stdout: stdout, Stderr: stderr, Rc: response.Rc}
 }
